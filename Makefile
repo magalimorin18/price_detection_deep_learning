@@ -1,6 +1,5 @@
 lint:
 	python -m pylint src
-	python -m mypy src
 	python -m flake8 src
 
 
