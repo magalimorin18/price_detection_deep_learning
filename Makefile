@@ -7,4 +7,7 @@ install-dev: install
 	pip install -r requirements-dev.txt
 
 install:
+	pip install wheel
 	pip install -r requirements.txt
+	
+
