@@ -1,0 +1,4 @@
+pylint==2.11.1
+isort==5.9.3
+flake8==4.0.1
+pre-commit==2.15.0
