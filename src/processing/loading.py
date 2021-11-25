@@ -53,8 +53,12 @@ class ImageDataset:
 
     def __getitem__(self, idx: int) -> np.ndarray:
         """Get one image."""
-        path = os.path.join(self.folder, get_file_from_id(idx))
+        path = self.get_path(idx)
         if os.path.isfile(path):
             return image.imread(path)
         else:
             raise ValueError("Image not found with this idx: '%s'" % path)
+
+    def get_path(self, idx: int) -> np.ndarray:
+        """Get the path of an image."""
+        return os.path.join(self.folder, get_file_from_id(idx))

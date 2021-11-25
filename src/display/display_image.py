@@ -16,7 +16,7 @@ def display_image(
 ) -> None:
     """Display one image."""
     if ax is None:
-        ax = plt.gcf()
+        ax = plt.gca()
     ax.imshow(img)
     ax.tick_params(axis="x", which="both", bottom=False, top=False, labelbottom=False)
     ax.tick_params(axis="y", which="both", left=False, right=False, labelleft=False)
