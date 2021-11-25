@@ -1,6 +1,22 @@
 # price_detection_deep_learning
 
 ## Data
+
+The structure of the data folder is the following:
+```
+- data
+    - train
+        - images
+            - 0000.jpg
+            - 0001.jpg
+        - annocations.csv
+    - test
+        - images
+            - 0000.jpg
+            - 0001.jpg
+        - results.csv
+```
+
 You can download the data from https://www.kaggle.com/itamargr/traxpricing-dataset, it is from the pricing challenge 2021 of Retail Vision for CVPR 2021 workshop https://retailvisionworkshop.github.io/pricing_challenge_2021/.
 
 

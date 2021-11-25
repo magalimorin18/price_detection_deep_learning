@@ -22,7 +22,7 @@ class AnnotationHandler:
     df: pd.DataFrame
 
     def __init__(
-        self, path: str = os.path.join(Config.DATA_FOLDER, "annotations.csv")
+        self, path: str = os.path.join(Config.TRAIN_FOLDER, "annotations.csv")
     ) -> None:
         """Init."""
         self.df = pd.read_csv(path, index_col=0)
@@ -41,7 +41,7 @@ class ImageDataset:
     len: int
 
     def __init__(
-        self, folder: str = os.path.join(Config.DATA_FOLDER, "images")
+        self, folder: str = os.path.join(Config.TRAIN_FOLDER, "images")
     ) -> None:
         """Init."""
         self.folder = folder
