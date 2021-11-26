@@ -1,4 +1,5 @@
 # +
+# pylint: disable=import-error
 # Setup the notebook
 import os
 import sys
@@ -39,7 +40,7 @@ dataset[0].shape
 
 # +
 W, H = 2, 2
-idx_offset = 10
+idx_offset = 0
 
 fig, axes = plt.subplots(W, H, figsize=(20, 10))
 for i in range(W):
