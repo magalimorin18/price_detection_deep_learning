@@ -17,7 +17,7 @@ class ObjectDetector:
     ) -> None:
         """Init."""
         self.model = torch.hub.load(repo_or_dir=model_name, model=model_version, pretrained=True)
-        logging.info("[Object Detector] Now ready to operate!")
+        logging.info(f"[Object Detector] Now ready to operate!")
 
     def extract_objects(self, images: List[str]) -> pd.DataFrame:
         """Extract objects.
@@ -57,7 +57,7 @@ class ObjectDetector:
 
 if __name__ == "__main__":
     model = ObjectDetector()
-    _results = model.extract_objects(
+    results = model.extract_objects(
         [os.path.join("data", "train", "images", str(i).rjust(4, "0") + ".jpg") for i in range(1)]
     )
-    print(_results.head(10))
+    print(results.head(10))
