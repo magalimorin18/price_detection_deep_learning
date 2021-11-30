@@ -1,6 +1,6 @@
 lint:
-	python -m pylint src
-	python -m flake8 src
+	python -m pylint src notebooks
+	python -m flake8 src notebooks
 
 
 install-dev: install
@@ -9,5 +9,5 @@ install-dev: install
 install:
 	pip install wheel
 	pip install -r requirements.txt
-	
+
 

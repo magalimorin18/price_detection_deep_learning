@@ -27,4 +27,3 @@ repos:
         entry: python -m pylint
         language: system
         types: [python]
-        args: ["--errors-only"]
