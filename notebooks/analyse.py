@@ -1,3 +1,4 @@
+"""Analysis of the data."""
 # +
 # %load_ext autoreload
 # %autoreload 2
@@ -5,16 +6,15 @@
 import os
 import sys
 
-import matplotlib.image as mpimg
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib import image
+from matplotlib import patches
 from PIL import Image
 
 sys.path.append(os.path.abspath("..."))
 # -
 
+# pylint: disable=unsubscriptable-object
 annotations: pd.DataFrame = pd.read_csv("../data/annotations.csv")
 
 annotations.head()
@@ -28,50 +28,55 @@ annotations.head()
 # final_noms_images = list(OrderedDict.fromkeys(noms_images))
 
 
-def afficher_image_box_prix(
-    image_name,
-):  # image_name est un string de la forme "0001.jpg"
-    x1 = []
-    x2 = []
-    y1 = []
-    y2 = []
-    price = []
-    rectangle = []
+# pylint: disable=too-many-locals
+def display_image_with_price(
+    image_name: str,
+):
+    """Display the image with boxes and prices.
+
+    image_name is a string with the following shape: "0001.jpg"
+    """
+    x1_list = []
+    x2_list = []
+    y1_list = []
+    y2_list = []
+    price_list = []
+    rectangles = []
 
     for annotation in annotations[annotations["img_name"] == image_name].itertuples():
-        x1.append(annotation.x1)
-        y1.append(annotation.y1)
-        x2.append(annotation.x2)
-        y2.append(annotation.y2)
-        price.append(annotation.price)
+        x1_list.append(annotation.x1)
+        y1_list.append(annotation.y1)
+        x2_list.append(annotation.x2)
+        y2_list.append(annotation.y2)
+        price_list.append(annotation.price)
 
-    for j in range(len(x1)):
+    for x1, x2, y1, y2, price in zip(x1_list, x2_list, y1_list, y2_list, price_list):
         rect = [
             patches.Rectangle(
-                (x1[j], y1[j]),
-                (x2[j] - x1[j]),
-                (y2[j] - y1[j]),
+                (x1, y1),
+                (x2 - x1),
+                (y2 - y1),
                 linewidth=2,
                 edgecolor="cyan",
                 fill=False,
             ),
-            x1[j],
-            y2[j],
-            str(price[j]),
+            x1,
+            y2,
+            str(price),
         ]
 
-        rectangle.append(rect)
+        rectangles.append(rect)
 
     path = os.path.join("..", "data", "images", image_name)
     im = Image.open(path)
     plt.imshow(im)
     ax = plt.gca()
-    for k in range(len(rectangle)):
-        ax.add_patch(rectangle[k][0])
+    for rectangle in rectangles:
+        ax.add_patch(rectangle[0])
         plt.text(
-            rectangle[k][1],
-            rectangle[k][2],
-            rectangle[k][3],
+            rectangle[1],
+            rectangle[2],
+            rectangle[3],
             backgroundcolor="r",
             color="b",
             fontsize="x-small",
@@ -83,4 +88,4 @@ def afficher_image_box_prix(
 # -
 
 for i in range(0, 6):
-    afficher_image_box_prix("000" + str(i) + ".jpg")
+    display_image_with_price("000" + str(i) + ".jpg")
