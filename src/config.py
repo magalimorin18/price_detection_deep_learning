@@ -15,4 +15,6 @@ TEST_IMAGES = os.path.join(DATA_FOLDER, "test", "images")
 TRAIN_ANNOTATIONS = os.path.join(DATA_FOLDER, "train", "results.csv")
 TRAIN_IMAGES = os.path.join(DATA_FOLDER, "train", "images")
 
-TRAIN_PRICE_LOCATIONS = os.path.join(DATA_FOLDER, "vott-csv-export", "Price-detection-export.csv")
+TRAIN_PRICE_LOCATIONS = os.path.join(
+    DATA_FOLDER, "price_boxes", "vott-csv-export", "Price-detection-export.csv"
+)

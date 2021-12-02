@@ -1,8 +1,10 @@
 # +
 """Finetuning of an RCNN for price detection."""
+# pylint: disable=wrong-import-position
 # %load_ext autoreload
 # %autoreload 2
 
+import logging
 import os
 import sys
 
@@ -10,17 +12,18 @@ import matplotlib.pyplot as plt
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
+sys.path.append(os.path.abspath(".."))
 from src.data.price_locations import PriceLocationsDataset
 from src.display.display_image import display_image
 
-sys.path.append(os.path.abspath(".."))
-
+logging.basicConfig(level=logging.INFO)
 # -
 
 dataset = PriceLocationsDataset()
 
 fig, ax = plt.subplots(1, 1, figsize=(30, 15))
-ele_img, ele_annotations = dataset.get_all_for_one_image("0001.jpg")
+ele_img, ele_annotations = dataset.get_all_for_one_image("0004.jpg")
+ele_annotations = ele_annotations.copy()
 ele_annotations["price"] = "1"
 display_image(ele_img, ele_annotations)
 

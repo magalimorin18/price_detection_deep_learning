@@ -34,3 +34,12 @@ The idea is to proceed using the following steps:
 - Train a model to predict the boxes positions
 - Check the predictions and add them to the dataset
 - Loop back until the model is good enough
+
+### Settings
+- Project Settings
+    - Source Connection: data/train/images
+    - Target Connection: data/price_boxes
+- Export Settings
+    - Provider: CSV
+    - Asset State: All Assets
+    - Include Images: false
