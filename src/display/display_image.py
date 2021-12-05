@@ -24,8 +24,8 @@ def display_image(img: np.ndarray, ax: Optional[plt.Axes] = None) -> None:
 
 
 def display_annotations(
-    annotations: Optional[pd.DataFrame],
-    ax: Optional[plt.Axes] = None,
+    annotations: pd.DataFrame,
+    ax: plt.Axes,
     color: Union[int, str] = 0,
     display_price: bool = True,
 ):

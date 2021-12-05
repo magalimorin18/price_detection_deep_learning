@@ -56,7 +56,7 @@ class ObjectDetector:
         return final_df
 
 
-def train_one_epoch(model: ObjectDetector, optimizer, data_loader, device, epoch):
+def train_one_epoch(model, optimizer, data_loader, device, epoch):
     """Train one epoch."""
     model.train()
     optimizer.zero_grad()
@@ -72,7 +72,7 @@ def train_one_epoch(model: ObjectDetector, optimizer, data_loader, device, epoch
         optimizer.zero_grad()
         loss_dict = model(images, targets)
 
-        losses = sum(loss for loss in loss_dict.values())
+        losses: torch.Tensor = sum(loss for loss in loss_dict.values())
         print(losses.item())
 
         # Compute gradient and optimize

@@ -1,7 +1,8 @@
 lint:
 	python -m pylint src notebooks
 	python -m flake8 src notebooks
-
+mypy:
+	python -m mypy src
 
 install-dev: install
 	pip install -r requirements-dev.txt
