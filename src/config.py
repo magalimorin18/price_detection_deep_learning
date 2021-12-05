@@ -6,6 +6,7 @@ import os
 SRC_FOLDER = os.path.abspath(os.path.dirname(__file__))
 ROOT_FOLDER = os.path.join(SRC_FOLDER, "..")
 DATA_FOLDER = os.path.join(ROOT_FOLDER, "data")
+SAVED_MODELS = os.path.join(ROOT_FOLDER, "models")
 
 
 # Dataset specifics

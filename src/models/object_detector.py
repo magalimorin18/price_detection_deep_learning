@@ -6,6 +6,7 @@ from typing import List
 
 import pandas as pd
 import torch
+from tqdm import tqdm
 
 
 # pylint: disable=too-few-public-methods
@@ -55,9 +56,26 @@ class ObjectDetector:
         return final_df
 
 
-if __name__ == "__main__":
-    model = ObjectDetector()
-    results = model.extract_objects(
-        [os.path.join("data", "train", "images", str(i).rjust(4, "0") + ".jpg") for i in range(1)]
-    )
-    print(results.head(10))
+def train_one_epoch(model: ObjectDetector, optimizer, data_loader, device, epoch):
+    """Train one epoch."""
+    model.train()
+    optimizer.zero_grad()
+
+    # WORK ONLY FOR ONE ELEMENT PER BATCH FOR NOW
+    for images, targets in tqdm(data_loader, desc=f"Epoch {epoch}", total=len(data_loader)):
+        # Put the data on the device
+        images = list(image.to(device) for image in images)
+
+        targets = [{k: v.squeeze(0).to(device) for k, v in targets.items()}]
+
+        # Pass on the model + Compute the loss
+        optimizer.zero_grad()
+        loss_dict = model(images, targets)
+
+        losses = sum(loss for loss in loss_dict.values())
+        print(losses.item())
+
+        # Compute gradient and optimize
+        losses.backward()
+        optimizer.step()
+    return losses
