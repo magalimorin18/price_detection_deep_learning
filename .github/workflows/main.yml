@@ -34,7 +34,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Install dependencies
-        run: make install-dev
+        run: make install-dev && make install-cpu
 
       - name: Lint
         run: make lint
