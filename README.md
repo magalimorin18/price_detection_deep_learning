@@ -23,6 +23,9 @@ You can download the data from https://www.kaggle.com/itamargr/traxpricing-datas
 ## Dev
 
 - Install the dependencies `make install-dev`
+- Install the torch dependencies
+    - On CPU: `make install-cpu`
+    - On GPU: `make install-gpu`
 
 
 ## Price annotation
