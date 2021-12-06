@@ -5,6 +5,7 @@ lint:
 
 install-dev: install
 	pip install -r requirements-dev.txt
+	pre-commit install
 
 install:
 	pip install wheel
