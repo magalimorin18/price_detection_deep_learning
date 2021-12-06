@@ -13,7 +13,7 @@ SAVED_MODELS = os.path.join(ROOT_FOLDER, "models")
 TEST_ANNOTATIONS = os.path.join(DATA_FOLDER, "test", "results.csv")
 TEST_IMAGES = os.path.join(DATA_FOLDER, "test", "images")
 
-TRAIN_ANNOTATIONS = os.path.join(DATA_FOLDER, "train", "results.csv")
+TRAIN_ANNOTATIONS = os.path.join(DATA_FOLDER, "train", "annotations.csv")
 TRAIN_IMAGES = os.path.join(DATA_FOLDER, "train", "images")
 
 TRAIN_PRICE_LOCATIONS = os.path.join(
