@@ -4,7 +4,7 @@
 Inspiration from this tutorial from pytorch:
 https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 """
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position,invalid-name
 # %load_ext autoreload
 # %autoreload 2
 
@@ -102,11 +102,7 @@ params = [p for p in model.parameters() if p.requires_grad]
 optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
 # -
 
-# +
-
-
 train_loader = DataLoader(dataset, BATCH_SIZE, shuffle=True)
-# -
 
 model.to(DEVICE)
 for epoch in range(EPOCHS):
@@ -133,3 +129,21 @@ display_annotations(model_annotations, ax=ax, color=1)
 
 # Save the model
 torch.save(model.state_dict(), os.path.join(SAVED_MODELS, "price_detection"))
+
+# +
+model.to("cpu")
+img_path = "../../test/images/0651.jpg"
+
+
+# Compute the model annotations
+model.eval()
+results = model(dataset.get_image(img_path).unsqueeze(0))
+model_annotations = convert_model_output_to_format(results[0])
+model_annotations["price"] = model_annotations["score"].apply(lambda x: round(x, 2))
+print(model_annotations)
+# Display
+fig, ax = plt.subplots(1, 1, figsize=(30, 15))
+display_image(dataset.get_original_image(img_path), ax=ax)
+display_annotations(ele_annotations, ax=ax, color=0)
+display_annotations(model_annotations, ax=ax, color=1)
+# -

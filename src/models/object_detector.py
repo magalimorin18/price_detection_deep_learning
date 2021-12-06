@@ -59,7 +59,6 @@ class ObjectDetector:
 def train_one_epoch(model, optimizer, data_loader, device, epoch):
     """Train one epoch."""
     model.train()
-    optimizer.zero_grad()
 
     # WORK ONLY FOR ONE ELEMENT PER BATCH FOR NOW
     for images, targets in tqdm(data_loader, desc=f"Epoch {epoch}", total=len(data_loader)):
@@ -73,7 +72,6 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch):
         loss_dict = model(images, targets)
 
         losses: torch.Tensor = sum(loss for loss in loss_dict.values())
-        print(losses.item())
 
         # Compute gradient and optimize
         losses.backward()

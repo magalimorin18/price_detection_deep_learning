@@ -68,7 +68,7 @@ class PriceLocationsDataset:
         """Get one image."""
         return imread(os.path.join(TRAIN_IMAGES, image_name))
 
-    def get_image(self, image_name: str) -> torch.tensor:
+    def get_image(self, image_name: str) -> torch.Tensor:
         """Get one image."""
         img = Image.open(os.path.join(TRAIN_IMAGES, image_name)).convert("RGB")
         if self.transforms:
