@@ -2,12 +2,20 @@
 
 import os
 
+# Classic locations
+SRC_FOLDER = os.path.abspath(os.path.dirname(__file__))
+ROOT_FOLDER = os.path.join(SRC_FOLDER, "..")
+DATA_FOLDER = os.path.join(ROOT_FOLDER, "data")
+SAVED_MODELS = os.path.join(ROOT_FOLDER, "models")
 
-# pylint: disable=too-few-public-methods
-class Config:
-    """Configuration file."""
 
-    SRC_FOLDER = os.path.dirname(os.path.abspath(__file__))
-    ROOT_FOLDER = os.path.join(SRC_FOLDER, "..")
-    TRAIN_FOLDER = os.path.join(ROOT_FOLDER, "data", "train")
-    TEST_FOLDER = os.path.join(ROOT_FOLDER, "data", "test")
+# Dataset specifics
+TEST_ANNOTATIONS = os.path.join(DATA_FOLDER, "test", "results.csv")
+TEST_IMAGES = os.path.join(DATA_FOLDER, "test", "images")
+
+TRAIN_ANNOTATIONS = os.path.join(DATA_FOLDER, "train", "results.csv")
+TRAIN_IMAGES = os.path.join(DATA_FOLDER, "train", "images")
+
+TRAIN_PRICE_LOCATIONS = os.path.join(
+    DATA_FOLDER, "price_boxes", "vott-csv-export", "Price-detection-export.csv"
+)

@@ -7,9 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-def evaluate_results(
-    *, predictions_path: str, truth_path: str, plot: bool = False
-) -> float:
+def evaluate_results(*, predictions_path: str, truth_path: str, plot: bool = False) -> float:
     """Evaluate the results.
 
     The format of the data (truth) should be:
@@ -54,9 +52,7 @@ def evaluate_results(
     return average_precision
 
 
-def generate_false_results(
-    *, truth_path: str, path: str, random_range: float = 2.0
-) -> False:
+def generate_false_results(*, truth_path: str, path: str, random_range: float = 2.0) -> False:
     """Generate false results from the truth."""
     pred_df = pd.read_csv(truth_path, index_col=0)
     pred_df["price"] = pred_df["price"].apply(lambda x: 0.0 if random() > 0.5 else x)
@@ -67,10 +63,10 @@ def generate_false_results(
 if __name__ == "__main__":
     import os
 
-    from src.config import Config
+    from src.config import TRAIN_IMAGES
 
-    t_p = os.path.join(Config.TRAIN_FOLDER, "annotations.csv")
-    p_p = os.path.join(Config.TRAIN_FOLDER, "pred_test.csv")
+    t_p = os.path.join(TRAIN_IMAGES, "annotations.csv")
+    p_p = os.path.join(TRAIN_IMAGES, "pred_test.csv")
     if not os.path.isfile(p_p):
         generate_false_results(truth_path=t_p, path=p_p, random_range=2)
 
