@@ -12,7 +12,8 @@ from torchvision import datasets, transforms
 from tqdm import tqdm
 
 sys.path.append(os.path.abspath(os.path.join("..", "..")))
-from src.config import SAVED_MODELS
+from src.models.digit_detector import MODEL_PATH
+from src.models.digit_detector import digit_classifier as model
 
 # %%
 # Define the transform
@@ -22,16 +23,6 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1
 # %%
 mnist_train = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
 
-
-# %%
-model = nn.Sequential(
-    nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1),
-    nn.MaxPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
-    nn.MaxPool2d(kernel_size=2, stride=2),
-    nn.Flatten(),
-    nn.Linear(1568, 10),
-)
 
 # %%
 # Check if the model is working
@@ -69,4 +60,4 @@ for epoch in range(EPOCHS):
             print(f"Epoch: {epoch}, batch: {batch_idx}, loss: {loss}")
 
 # %%
-torch.save(model.state_dict(), os.path.join(SAVED_MODELS, "digit_classifier.pt"))
+torch.save(model.state_dict(), MODEL_PATH)

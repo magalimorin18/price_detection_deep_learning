@@ -54,11 +54,12 @@ fig, axes = plt.subplots(W, H, figsize=(15, 10))
 for w in range(W):
     for h in range(H):
         i = w * H + h
-        price_img = price_imgs[i]
-        ax = axes[w][h]
-        ax.imshow(price_img)
+        if i < len(price_imgs):
+            price_img = price_imgs[i]
+            ax = axes[w][h]
+            ax.imshow(price_img)
 # -
-img = price_imgs[3]
+img = price_imgs[5]
 plt.imshow(img)
 img.shape
 
@@ -67,15 +68,14 @@ cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 digit_detector = DigitDetector()
 
-digits_locations = (
-    digit_detector.extract_digits_locations(img).reset_index().rename(columns={"index": "price"})
-)
+digits_locations = digit_detector.extract_digits_locations(img).rename(columns={"result": "price"})
 digits_locations.head()
 
 # +
 fig, ax = plt.subplots(1, 1)
 
 display_image(img, ax=ax)
+digits_locations["price"] = digits_locations["price"].apply(lambda x: x[0])
 display_annotations(digits_locations, ax=ax)
 # -
 
