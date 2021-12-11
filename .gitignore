@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 docs
 test.py
+src/models/data
