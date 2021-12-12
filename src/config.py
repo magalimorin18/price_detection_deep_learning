@@ -19,3 +19,7 @@ TRAIN_IMAGES = os.path.join(DATA_FOLDER, "train", "images")
 TRAIN_PRICE_LOCATIONS = os.path.join(
     DATA_FOLDER, "price_boxes", "vott-csv-export", "Price-detection-export.csv"
 )
+
+
+# MODELS
+PRICE_DETECTION_MODEL_PATH = os.path.join(SAVED_MODELS, "price_detection_model.pt")

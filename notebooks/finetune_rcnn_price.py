@@ -16,20 +16,19 @@ import matplotlib.pyplot as plt
 import torch
 import torchvision
 from torch.utils.data import DataLoader
-from torchvision import transforms as T
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 sys.path.append(os.path.abspath(".."))
-from src.config import SAVED_MODELS
+from src.config import PRICE_DETECTION_MODEL_PATH
 from src.data.price_locations import PriceLocationsDataset
 from src.display.display_image import display_annotations, display_image
-from src.models.object_detector import train_one_epoch
+from src.models.price_detector import transforms
+from src.models.utils import train_one_epoch
 from src.utils.price_detection_utils import convert_model_output_to_format
 
 logging.basicConfig(level=logging.INFO)
 # -
-
-transforms = T.Compose([T.ToTensor(), T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+print(transforms)
 
 dataset = PriceLocationsDataset(transforms=transforms)
 
@@ -128,7 +127,7 @@ display_annotations(model_annotations, ax=ax, color=1)
 # -
 
 # Save the model
-torch.save(model.state_dict(), os.path.join(SAVED_MODELS, "price_detection"))
+torch.save(model.state_dict(), PRICE_DETECTION_MODEL_PATH)
 
 # +
 model.to("cpu")
