@@ -1,7 +1,7 @@
 """Price detector model."""
 
 import logging
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ transforms = T.Compose([T.ToTensor(), T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.
 class PriceDetector:
     """Price detector using a fasterRCNN model."""
 
-    def __init__(self, device: int = -1):
+    def __init__(self, device: Union[int, torch.device] = 0):
         """Init."""
         logging.info("[Price Detector] Initializing...")
         self.device = device
@@ -31,14 +31,15 @@ class PriceDetector:
             self.model.roi_heads.box_predictor.cls_score.in_features, NUM_CLASSES
         )
         self.model.load_state_dict(torch.load(PRICE_DETECTION_MODEL_PATH))
-        self.model.to(self.device)
+        # self.model.to(self.device)
         logging.info("[Price Detector] Initialized.")
 
     def extract_prices_locations(self, images: List[np.ndarray]) -> List[pd.DataFrame]:
         """Extract prices locations from images."""
         logging.info("[Price Detector] Extracting prices locations...")
         self.model.eval()
-        results = self.model(torch.tensor(np.stack(images)).to(self.device))
+        images = torch.stack([transforms(x) for x in images])
+        results = self.model(images)
         prices_locations = []
         for result in results:
             model_annotations = convert_model_output_to_format(result)
