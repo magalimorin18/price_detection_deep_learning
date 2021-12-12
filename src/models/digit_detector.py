@@ -87,5 +87,4 @@ class DigitDetector:
         image = self.prepare_img_for_detection(image, x1, y1, x2, y2)
         with torch.no_grad():
             output = self.model(image.unsqueeze(0).float())
-        print(output, output.argmax())
         return output.argmax().item(), round(output.max().item(), 2)
