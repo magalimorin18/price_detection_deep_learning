@@ -16,6 +16,8 @@ def display_image(img: np.ndarray, ax: Optional[plt.Axes] = None) -> None:
     if ax is None:
         ax = plt.gca()
 
+    if not isinstance(img, np.ndarray):
+        img = np.array(img)
     if img.shape[0] == 3:
         img = np.transpose(img, (1, 2, 0))
     ax.imshow(img)
