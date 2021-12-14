@@ -64,5 +64,5 @@ def display_annotations(
                 )
             )
         if display_price:
-            txt = ax.text(annotation.x1, annotation.y1, annotation.price, color=color)
-            txt.set_path_effects([PathEffects.withStroke(linewidth=5, foreground="#000000F0")])
+            txt = ax.text(annotation.x1, annotation.y1, annotation.price, color=color, fontsize=7)
+            txt.set_path_effects([PathEffects.withStroke(linewidth=2, foreground="#000000F0")])
