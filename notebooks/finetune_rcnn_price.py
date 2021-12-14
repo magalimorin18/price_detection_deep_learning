@@ -84,6 +84,7 @@ display_annotations(ele_annotations, ax=ax, color=0)
 display_annotations(model_annotations, ax=ax, color=1)
 # -
 
+# To check the model output when in train mode
 model.train()
 img, annotations = dataset[0]
 print(annotations.keys(), annotations["boxes"].shape, annotations["labels"].shape)
@@ -143,6 +144,6 @@ print(model_annotations)
 # Display
 fig, ax = plt.subplots(1, 1, figsize=(30, 15))
 display_image(dataset.get_original_image(img_path), ax=ax)
-display_annotations(ele_annotations, ax=ax, color=0)
+# display_annotations(ele_annotations, ax=ax, color=0)
 display_annotations(model_annotations, ax=ax, color=1)
 # -
