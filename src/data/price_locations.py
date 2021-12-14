@@ -10,8 +10,8 @@ import torch
 from matplotlib.image import imread
 from PIL import Image
 
-from src.config import TRAIN_IMAGES, TRAIN_PRICE_LOCATIONS
-from src.processing.vott import load_vott_data
+from src.config import TRAIN_IMAGES
+from src.processing.annotations import load_price_annotations
 
 
 class PriceLocationsDataset:
@@ -21,7 +21,7 @@ class PriceLocationsDataset:
 
     def __init__(self, transforms=None) -> None:
         """Init."""
-        self.annotations = load_vott_data(TRAIN_PRICE_LOCATIONS)
+        self.annotations = load_price_annotations()
         self.annotations.img_name = self.annotations.img_name.apply(
             lambda name: os.path.join(TRAIN_IMAGES, name)
         )

@@ -38,10 +38,9 @@ class PriceDetector:
         """Extract prices locations from images."""
         logging.info("[Price Detector] Extracting prices locations...")
         self.model.eval()
-        images = torch.stack([transforms(x) for x in images])
-        results = self.model(images)
         prices_locations = []
-        for result in results:
+        for image in images:
+            result = self.model(transforms(image).unsqueeze(0))[0]
             model_annotations = convert_model_output_to_format(result)
             model_annotations["price"] = model_annotations["score"].apply(lambda x: round(x, 2))
             prices_locations.append(model_annotations)

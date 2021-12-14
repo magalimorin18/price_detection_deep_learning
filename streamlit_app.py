@@ -31,7 +31,7 @@ st.markdown("## 1. Upload an image")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
 
-with NamedTemporaryFile() as temp_image:
+with NamedTemporaryFile(delete=False) as temp_image:
 
     if uploaded_file is not None:
         st.markdown("Your image has been uploaded.")
