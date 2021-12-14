@@ -71,6 +71,16 @@ class DigitDetector:
     ) -> np.ndarray:
         """Prepare image for digit detection."""
         img = image[y1:y2, x1:x2]
+        if img.shape[:2] == (0, 0):
+            logging.warning(
+                "[DigitDetector] Not an image (%d, %d) & (%d, %d) (image shape: %s",
+                x1,
+                y1,
+                x2,
+                y2,
+                image.shape,
+            )
+            return np.zeros((28, 28))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = cv2.resize(img, (28, 28))
         img = cv2.bitwise_not(img)
