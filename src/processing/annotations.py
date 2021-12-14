@@ -41,6 +41,6 @@ def combine_all_annotations() -> None:
 def load_price_annotations() -> pd.DataFrame:
     """Load the price annotations."""
     if os.path.isfile(TRAIN_PRICE_LOCATIONS_FILE):
-        return pd.read_csv(TRAIN_PRICE_LOCATIONS_FILE)
-    logging.warning("No annotations found for %s", TRAIN_PRICE_LOCATIONS_FILE)
-    return pd.DataFrame()
+        annotations: pd.DataFrame = pd.read_csv(TRAIN_PRICE_LOCATIONS_FILE)
+        return annotations
+    raise FileNotFoundError(f"No annotations found for {TRAIN_PRICE_LOCATIONS_FILE}")

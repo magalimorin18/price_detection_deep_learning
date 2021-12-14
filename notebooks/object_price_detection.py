@@ -1,6 +1,6 @@
 # +
 """Distance object price."""
-# pylint: disable=wrong-import-position,invalid-name
+# pylint: disable=wrong-import-position,invalid-name,unsubscriptable-object,no-member
 # %load_ext autoreload
 # %autoreload 2
 
@@ -14,9 +14,9 @@ import pandas as pd
 from matplotlib.image import imread
 
 sys.path.append(os.path.abspath(".."))
-from src.config import TRAIN_ANNOTATIONS, TRAIN_IMAGES, TRAIN_PRICE_LOCATIONS
+from src.config import TRAIN_ANNOTATIONS, TRAIN_IMAGES
 from src.display.display_image import display_annotations, display_image
-from src.processing.vott import load_vott_data
+from src.processing.annotations import load_price_annotations
 from src.utils.distances import (
     compute_price_positions,
     compute_product_positions,
@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 products = pd.read_csv(TRAIN_ANNOTATIONS).set_index("id")
 products.head()
 
-prices = load_vott_data(TRAIN_PRICE_LOCATIONS)
+prices = load_price_annotations()
 prices.head()
 
 # +
