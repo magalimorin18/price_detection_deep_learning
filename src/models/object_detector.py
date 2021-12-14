@@ -12,6 +12,8 @@ import torch
 class ObjectDetector:
     """Object detector using YOLO."""
 
+    USELESS_CLASSES = {"refrigerator", "pizza"}
+
     def __init__(
         self, model_name: str = "ultralytics/yolov5", model_version: str = "yolov5s"
     ) -> None:
@@ -51,5 +53,8 @@ class ObjectDetector:
         to_change_cols = ["x1", "x2", "y1", "y2"]
         for col in to_change_cols:
             final_df[col] = final_df[col].astype(int)
+
+        # Remove useless classes
+        final_df = final_df[~final_df["yolo_class_name"].isin(self.USELESS_CLASSES)]
 
         return final_df
