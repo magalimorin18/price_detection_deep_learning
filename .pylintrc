@@ -85,7 +85,8 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead
+        use-symbolic-message-instead,
+        W0511
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -205,7 +206,7 @@ good-names=i,
            ex,
            Run,
            _,
-           x1,x2,y1,y2,ax,im,df,p,q
+           x1,x2,y1,y2,ax,im,df,v,p,q
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted

@@ -65,6 +65,8 @@ with NamedTemporaryFile(delete=False) as temp_image:
             prices = price_detector.extract_prices_locations([image])[0]
         st.dataframe(prices)
 
+        # TODO: Remove the prices that overlap more than 50% with the products
+
         fig, ax = plt.subplots(figsize=(10, 10))
         display_image(image, ax=ax)
         display_annotations(prices, ax=ax, color=0)
