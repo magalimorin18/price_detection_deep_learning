@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import Tuple
+from typing import Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ import torch
 from matplotlib.image import imread
 from PIL import Image
 
-from src.config import TRAIN_IMAGES
+from src.config import TEST_IMAGES, TRAIN_IMAGES
 from src.processing.annotations import load_price_annotations
 
 
@@ -19,11 +19,12 @@ class PriceLocationsDataset:
 
     annotations: pd.DataFrame
 
-    def __init__(self, transforms=None) -> None:
+    def __init__(self, transforms=None, dataset: Literal["train", "test"] = "train") -> None:
         """Init."""
+        self.image_folder = TRAIN_IMAGES if dataset == "train" else TEST_IMAGES
         self.annotations = load_price_annotations()
         self.annotations.img_name = self.annotations.img_name.apply(
-            lambda name: os.path.join(TRAIN_IMAGES, name)
+            lambda name: os.path.join(self.image_folder, name)
         )
         self.unique_images = self.annotations.img_name.unique().tolist()
         self.transforms = transforms
@@ -63,20 +64,19 @@ class PriceLocationsDataset:
         ]
         return annotations
 
-    @staticmethod
-    def get_original_image(image_name: str) -> np.ndarray:
+    def get_original_image(self, image_name: str) -> np.ndarray:
         """Get one image."""
-        return imread(os.path.join(TRAIN_IMAGES, image_name))
+        return imread(os.path.join(self.image_folder, image_name))
 
     def get_image(self, image_name: str) -> torch.Tensor:
         """Get one image."""
-        img = Image.open(os.path.join(TRAIN_IMAGES, image_name)).convert("RGB")
+        img = Image.open(os.path.join(self.image_folder, image_name)).convert("RGB")
         if self.transforms:
             img = self.transforms(img)
         return img
 
 
 if __name__ == "__main__":
-    dataset = PriceLocationsDataset()
-    print(dataset.annotations.head())
-    print(dataset[0])
+    dataset_ = PriceLocationsDataset()
+    print(dataset_.annotations.head())
+    print(dataset_[0])

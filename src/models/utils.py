@@ -1,14 +1,38 @@
 """Utils for models."""
 
 import datetime
+import logging
 import os
+from typing import Dict, Literal
 
 import numpy as np
 import pandas as pd
 import torch
+import torchvision
+from scipy import stats
+from torch.utils.data import DataLoader
+from torchvision import transforms as T
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from tqdm import tqdm
 
 from src.config import TRAINING_RESULTS_FILE
+from src.data.price_locations import PriceLocationsDataset
+
+NUM_CLASSES = 2  # Price label + background
+transforms = T.Compose([T.ToTensor(), T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+
+def get_model(*, model_type: Literal["resnet50"] = "resnet50", pretrained=True):
+    """Return the pretrained model."""
+    if model_type == "resnet50":
+        model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=pretrained)
+    else:
+        raise NotImplementedError(f"Model {model_type} not implemented")
+    # Change the head of the model with a new one, adapted to our number of classes
+    model.roi_heads.box_predictor = FastRCNNPredictor(
+        model.roi_heads.box_predictor.cls_score.in_features, NUM_CLASSES
+    )
+    return model
 
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch):
@@ -77,17 +101,46 @@ def evaluate_and_save(model, data_loader, device, params):
     df.to_csv(TRAINING_RESULTS_FILE, index=False)
 
 
-def iterate_params(params_config):
-    """Iterate over the parameters, retrieving one parameter from each distribution."""
-    for key, value in params_config.items():
-        if isinstance(value, dict):
-            for k, v in value.items():
-                yield (key, k, v)
-        else:
-            yield (key, None, value)
+def get_params_from_distributions(params_config: Dict[str, stats.rv_continuous]):
+    """Iterate over the parameters, retrieving one value from each distribution."""
+    return {k: v.rvs(size=1)[0] for k, v in params_config.items()}
 
 
-def find_best_model(model, train_loader, val_loader, device, params_config, n: int = 10):
+def find_best_model(
+    params_config: Dict[str, stats.rv_continuous],
+    batch_size: int = 1,
+    n: int = 10,
+):
     """Find the best model with training."""
-    params = dict()
-    # TODO: Write the code to find the best model
+    # Security check
+    if os.path.isfile(TRAINING_RESULTS_FILE):
+        logging.warning("We already have a training file, we will not overwrite it")
+        raise FileExistsError(TRAINING_RESULTS_FILE)
+
+    # Load the dataloaders
+    train_dataset = PriceLocationsDataset(transforms=transforms, dataset="train")
+    train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
+    val_dataset = PriceLocationsDataset(transforms=transforms, dataset="test")
+    val_loader = DataLoader(val_dataset, batch_size, shuffle=False)
+
+    for step in range(n):
+        params = get_params_from_distributions(params_config)
+        logging.info("Starting step %d", step)
+        logging.info("Parameters: %s", params)
+
+        # Create the model
+        model = get_model(model_type=params.get("model_type", "resnet50"), pretrained=True)
+        params = [p for p in model.parameters() if p.requires_grad]
+        optimizer = torch.optim.SGD(
+            [p for p in model.parameters() if p.requires_grad],
+            lr=params.get("OPTI_LEARNING_RATE"),
+            momentum=params.get("OPTI_MOMENTUM"),
+            weight_decay=params.get("OPTI_WEIGHT_DECAY"),
+        )
+
+        # Training the model
+        for epoch in range(params.get("epochs", 10)):
+            train_one_epoch(model, optimizer, train_loader, torch.device("cuda:0"), epoch)
+
+        # Evaluating the model
+        evaluate_and_save(model, val_loader, torch.device("cuda:0"), params)

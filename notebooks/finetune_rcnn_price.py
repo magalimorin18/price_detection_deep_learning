@@ -15,16 +15,13 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torchvision
 from torch.utils.data import DataLoader
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 sys.path.append(os.path.abspath(".."))
 from src.config import PRICE_DETECTION_MODEL_PATH
 from src.data.price_locations import PriceLocationsDataset
 from src.display.display_image import display_annotations, display_image
-from src.models.price_detector import transforms
-from src.models.utils import train_one_epoch
+from src.models.utils import get_model, train_one_epoch, transforms
 from src.utils.price_detection_utils import convert_model_output_to_format
 
 logging.basicConfig(level=logging.INFO)
@@ -56,12 +53,7 @@ display_annotations(ele_annotations, ax=ax, color=0)
 NUM_CLASSES = 2  # Price label + background
 
 # Load the model
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
-
-# Change the head of the model with a new one, adapted to our number of classes
-model.roi_heads.box_predictor = FastRCNNPredictor(
-    model.roi_heads.box_predictor.cls_score.in_features, NUM_CLASSES
-)
+model = get_model(model_type="resnet50")
 print(
     "Number of input features for the classes classifier",
     model.roi_heads.box_predictor.cls_score.in_features,
@@ -156,10 +148,7 @@ evaluate_and_save(
 # ## Analysis of the results
 
 # Load the model
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=False)
-model.roi_heads.box_predictor = FastRCNNPredictor(
-    model.roi_heads.box_predictor.cls_score.in_features, NUM_CLASSES
-)
+model = get_model(model_type="resnet50", pretrained=False)
 model.load_state_dict(torch.load(PRICE_DETECTION_MODEL_PATH))
 
 # +

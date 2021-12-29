@@ -6,16 +6,10 @@ from typing import List, Union
 import numpy as np
 import pandas as pd
 import torch
-import torchvision
-from torchvision import transforms as T
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 from src.config import PRICE_DETECTION_MODEL_PATH
+from src.models.utils import get_model, transforms
 from src.utils.price_detection_utils import convert_model_output_to_format
-
-NUM_CLASSES = 2
-
-transforms = T.Compose([T.ToTensor(), T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 
 # pylint: disable=too-few-public-methods
@@ -26,10 +20,7 @@ class PriceDetector:
         """Init."""
         logging.info("[Price Detector] Initializing...")
         self.device = device
-        self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=False)
-        self.model.roi_heads.box_predictor = FastRCNNPredictor(
-            self.model.roi_heads.box_predictor.cls_score.in_features, NUM_CLASSES
-        )
+        self.model = get_model(model_type="resnet50", pretrained=False)
         self.model.load_state_dict(torch.load(PRICE_DETECTION_MODEL_PATH))
         # self.model.to(self.device)
         logging.info("[Price Detector] Initialized.")
