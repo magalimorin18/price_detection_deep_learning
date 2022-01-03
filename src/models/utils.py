@@ -3,13 +3,14 @@
 import datetime
 import logging
 import os
-from typing import Dict, Literal
+from math import ceil
+from random import choice
+from typing import Any, Dict, Literal
 
 import numpy as np
 import pandas as pd
 import torch
 import torchvision
-from scipy import stats
 from torch.utils.data import DataLoader
 from torchvision import transforms as T
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -26,6 +27,10 @@ def get_model(*, model_type: Literal["resnet50"] = "resnet50", pretrained=True):
     """Return the pretrained model."""
     if model_type == "resnet50":
         model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=pretrained)
+    elif model_type == "mobilnetv3":
+        model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(
+            pretrained=pretrained
+        )
     else:
         raise NotImplementedError(f"Model {model_type} not implemented")
     # Change the head of the model with a new one, adapted to our number of classes
@@ -101,13 +106,22 @@ def evaluate_and_save(model, data_loader, device, params):
     df.to_csv(TRAINING_RESULTS_FILE, index=False)
 
 
-def get_params_from_distributions(params_config: Dict[str, stats.rv_continuous]):
+def get_params_from_distributions(params_config: Dict[str, Any]):
     """Iterate over the parameters, retrieving one value from each distribution."""
-    return {k: v.rvs(size=1)[0] for k, v in params_config.items()}
+    params = {}
+    for k, v in params_config.items():
+        try:
+            params[k] = v.rvs(size=1)[0]
+        except AttributeError:
+            if isinstance(v, list):
+                params[k] = choice(v)
+            else:
+                params[k] = v
+    return params
 
 
 def find_best_model(
-    params_config: Dict[str, stats.rv_continuous],
+    params_config: Dict[str, Any],
     batch_size: int = 1,
     n: int = 10,
 ):
@@ -130,16 +144,16 @@ def find_best_model(
 
         # Create the model
         model = get_model(model_type=params.get("model_type", "resnet50"), pretrained=True)
-        params = [p for p in model.parameters() if p.requires_grad]
-        optimizer = torch.optim.SGD(
-            [p for p in model.parameters() if p.requires_grad],
+        params_to_optimize = [p for p in model.parameters() if p.requires_grad]
+        optimizer = torch.optim.Adam(
+            params_to_optimize,
             lr=params.get("OPTI_LEARNING_RATE"),
-            momentum=params.get("OPTI_MOMENTUM"),
+            betas=params.get("OPTI_BETA", (0.9, 0.999)),
             weight_decay=params.get("OPTI_WEIGHT_DECAY"),
         )
 
         # Training the model
-        for epoch in range(params.get("epochs", 10)):
+        for epoch in range(ceil(params.get("epochs", 10))):
             train_one_epoch(model, optimizer, train_loader, torch.device("cuda:0"), epoch)
 
         # Evaluating the model

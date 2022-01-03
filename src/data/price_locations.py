@@ -19,10 +19,10 @@ class PriceLocationsDataset:
 
     annotations: pd.DataFrame
 
-    def __init__(self, transforms=None, dataset: Literal["train", "test"] = "train") -> None:
+    def __init__(self, dataset: Literal["train", "test"] = "train", transforms=None) -> None:
         """Init."""
         self.image_folder = TRAIN_IMAGES if dataset == "train" else TEST_IMAGES
-        self.annotations = load_price_annotations()
+        self.annotations = load_price_annotations(dataset=dataset)
         self.annotations.img_name = self.annotations.img_name.apply(
             lambda name: os.path.join(self.image_folder, name)
         )

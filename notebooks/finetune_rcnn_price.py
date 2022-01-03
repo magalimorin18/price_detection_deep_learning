@@ -1,4 +1,3 @@
-# +
 """Finetuning of an RCNN for price detection.
 
 Inspiration from this tutorial from pytorch:
