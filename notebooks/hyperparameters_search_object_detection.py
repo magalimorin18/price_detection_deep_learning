@@ -1,6 +1,6 @@
 # +
 """Search for the best hyperp   arams for the object detection model."""
-# pylint: disable=wrong-import-position,invalid-name,expression-not-assigned
+# pylint: disable=wrong-import-position,invalid-name,expression-not-assigned,no-member,pointless-statement
 # %load_ext autoreload
 # %autoreload 2
 
@@ -53,3 +53,7 @@ if True:
 
 df = pd.read_csv("../data/training_results.csv")
 df.head()
+
+df
+
+df.sort_values(by="loss_objectness")
