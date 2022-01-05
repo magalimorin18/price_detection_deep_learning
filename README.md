@@ -9,7 +9,11 @@ The structure of the data folder is the following:
         - images
             - 0000.jpg
             - 0001.jpg
+        - price_tags
+            - 0000.csv
+            - 0001.csv
         - annocations.csv
+        - price_tags.csv
     - test
         - images
             - 0000.jpg
@@ -31,18 +35,9 @@ You can download the data from https://www.kaggle.com/itamargr/traxpricing-datas
 ## Price annotation
 
 To perform the price detection on the image, we need a dataset of the boxes on the images of the prices tickets.
-We are using [VoTT](https://github.com/microsoft/VoTT), an open source tool from microsoft, to annotate a few images.
+We are using [jupyter_bbox_widget](https://github.com/gereleth/jupyter-bbox-widget), a module that allows to annotate images directly in a jupyter notebook, and is easy to use + easy to retrieve annotations and put new annotations from our model.
 The idea is to proceed using the following steps:
 - Annotate a few images (boxes coordinates and size)
 - Train a model to predict the boxes positions
 - Check the predictions and add them to the dataset
 - Loop back until the model is good enough
-
-### Settings
-- Project Settings
-    - Source Connection: data/train/images
-    - Target Connection: data/price_boxes
-- Export Settings
-    - Provider: CSV
-    - Asset State: All Assets
-    - Include Images: false

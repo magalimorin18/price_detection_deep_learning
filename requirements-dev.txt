@@ -4,3 +4,4 @@ flake8==4.0.1
 pre-commit==2.15.0
 black==21.11b1
 mypy==0.910
+jupyter_bbox_widget==0.3.4
