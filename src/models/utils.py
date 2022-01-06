@@ -18,6 +18,8 @@ from tqdm import tqdm
 
 from src.config import TRAINING_RESULTS_FILE
 from src.data.price_locations import PriceLocationsDataset
+from src.utils.metrics import metric_iou
+from src.utils.price_detection_utils import convert_model_output_to_format
 
 NUM_CLASSES = 2  # Price label + background
 transforms = T.Compose([T.ToTensor(), T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -70,9 +72,15 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch):
 def evaluate_loss(model, data_loader, device):
     """Evaluate one model on object detection."""
     model.to(device)
-    model.train()
     losses = {
-        k: [] for k in ["loss_classifier", "loss_box_reg", "loss_objectness", "loss_rpn_box_reg"]
+        k: []
+        for k in [
+            "loss_classifier",
+            "loss_box_reg",
+            "loss_objectness",
+            "loss_rpn_box_reg",
+            "iou_score",
+        ]
     }
     with torch.no_grad():
         for images, targets in tqdm(data_loader, desc="Evaluation", total=len(data_loader)):
@@ -82,9 +90,21 @@ def evaluate_loss(model, data_loader, device):
             targets = [{k: v.squeeze(0).to(device) for k, v in targets.items()}]
 
             # Pass on the model + Compute the loss
+            # TODO: Super slow for now, but now way without
+            # Changing how the repo work
+            model.train()
             loss_dict = model(images, targets)
+            model.eval()
+            pred = model(images)
+
+            # IOU score
+            pred_locations = convert_model_output_to_format(pred[0])
+            true_locations = convert_model_output_to_format(targets[0])
+            iou_score = metric_iou(images[0], true_locations, pred_locations)
+
             for k, v in loss_dict.items():
                 losses[k].append(v.item())
+            losses["iou_score"].append(iou_score)
     return losses
 
 

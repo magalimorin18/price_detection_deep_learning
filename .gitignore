@@ -130,3 +130,4 @@ dmypy.json
 tmp_*.py
 docs
 test.py
+test.ipynb
