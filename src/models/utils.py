@@ -112,8 +112,14 @@ def evaluate_and_save(model, data_loader, device, params):
     """Evaluate one model on object detection."""
     # Get the data
     loss_results = evaluate_loss(model, data_loader, device)
-    loss_means = {k: np.mean(v) for k, v in loss_results.items()}
-    result = {**loss_means, **{f"model_param_{k}": v for k, v in params.items()}}
+    metrics = {}
+    for k, v in loss_results.items():
+        metrics[f"{k}_mean"] = np.mean(v)
+        metrics[f"{k}_std"] = np.std(v)
+        metrics[f"{k}_max"] = np.max(v)
+        metrics[f"{k}_min"] = np.min(v)
+
+    result = {**metrics, **{f"model_param_{k}": v for k, v in params.items()}}
     result["date"] = str(datetime.datetime.now())
 
     # Save the data
