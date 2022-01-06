@@ -9,7 +9,7 @@ extension-pkg-allow-list=
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code. (This is an alternative name to extension-pkg-allow-list
 # for backward compatibility.)
-extension-pkg-whitelist=
+extension-pkg-whitelist=lxml
 
 # Return non-zero exit code if any of these messages/categories are detected,
 # even if score is above --fail-under value. Syntax same as enable. Messages
@@ -85,7 +85,8 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead
+        use-symbolic-message-instead,
+        W0511
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -205,7 +206,7 @@ good-names=i,
            ex,
            Run,
            _,
-           x1,x2,y1,y2,ax,im,df,x
+           x1,x2,y1,y2,ax,im,df,v,n,p,q,x
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted

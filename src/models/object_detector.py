@@ -6,12 +6,13 @@ from typing import List
 
 import pandas as pd
 import torch
-from tqdm import tqdm
 
 
 # pylint: disable=too-few-public-methods
 class ObjectDetector:
     """Object detector using YOLO."""
+
+    USELESS_CLASSES = {"refrigerator", "pizza"}
 
     def __init__(
         self, model_name: str = "ultralytics/yolov5", model_version: str = "yolov5s"
@@ -53,27 +54,7 @@ class ObjectDetector:
         for col in to_change_cols:
             final_df[col] = final_df[col].astype(int)
 
+        # Remove useless classes
+        final_df = final_df[~final_df["yolo_class_name"].isin(self.USELESS_CLASSES)]
+
         return final_df
-
-
-def train_one_epoch(model, optimizer, data_loader, device, epoch):
-    """Train one epoch."""
-    model.train()
-
-    # WORK ONLY FOR ONE ELEMENT PER BATCH FOR NOW
-    for images, targets in tqdm(data_loader, desc=f"Epoch {epoch}", total=len(data_loader)):
-        # Put the data on the device
-        images = list(image.to(device) for image in images)
-
-        targets = [{k: v.squeeze(0).to(device) for k, v in targets.items()}]
-
-        # Pass on the model + Compute the loss
-        optimizer.zero_grad()
-        loss_dict = model(images, targets)
-
-        losses: torch.Tensor = sum(loss for loss in loss_dict.values())
-
-        # Compute gradient and optimize
-        losses.backward()
-        optimizer.step()
-    return losses

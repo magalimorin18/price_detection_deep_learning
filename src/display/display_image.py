@@ -18,6 +18,8 @@ def display_image(
     if ax is None:
         ax = plt.gca()
 
+    if not isinstance(img, np.ndarray):
+        img = np.array(img)
     if img.shape[0] == 3:
         img = np.transpose(img, (1, 2, 0))
     ax.imshow(img)
@@ -35,6 +37,7 @@ def display_annotations(
     ax: plt.Axes,
     color: Union[int, str] = 0,
     display_price: bool = True,
+    display_center: bool = True,
 ):
     """Display annotations.
 
@@ -46,6 +49,8 @@ def display_annotations(
         color = COLOR_LIST[color]
     if "price" not in annotations:
         display_price = False
+    if "pos_x" not in annotations or "pos_y" not in annotations:
+        display_center = False
     for annotation in annotations.itertuples():
         ax.add_patch(
             patches.Rectangle(
@@ -56,6 +61,15 @@ def display_annotations(
                 fill=None,
             )
         )
+        if display_center:
+            ax.add_patch(
+                patches.Circle(
+                    (annotation.pos_x, annotation.pos_y),
+                    radius=4,
+                    color="b",
+                    fill=None,
+                )
+            )
         if display_price:
-            txt = ax.text(annotation.x1, annotation.y1, annotation.price, color=color)
-            txt.set_path_effects([PathEffects.withStroke(linewidth=5, foreground="#000000F0")])
+            txt = ax.text(annotation.x1, annotation.y1, annotation.price, color=color, fontsize=7)
+            txt.set_path_effects([PathEffects.withStroke(linewidth=2, foreground="#000000F0")])
