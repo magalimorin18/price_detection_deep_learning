@@ -1,6 +1,6 @@
 # +
 """Search for the best hyperp   arams for the object detection model."""
-# pylint: disable=wrong-import-position,invalid-name,expression-not-assigned,no-member,pointless-statement
+# pylint: disable=wrong-import-position,invalid-name,expression-not-assigned,no-member,pointless-statement,unsubscriptable-object
 # %load_ext autoreload
 # %autoreload 2
 
@@ -56,4 +56,8 @@ df.head()
 
 df
 
-df.sort_values(by="loss_objectness")
+loss_cols = [x for x in df.columns if x.startswith("loss_")]
+other_cols = [x for x in df.columns if x not in loss_cols]
+df.columns
+
+df[other_cols].sort_values(by="iou_score_mean", ascending=False)
