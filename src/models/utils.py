@@ -20,7 +20,7 @@ from tqdm import tqdm
 from src.config import TRAINING_RESULTS_FILE
 from src.data.price_locations import PriceLocationsDataset
 from src.models.object_detector import ObjectDetector
-from src.processing.overlap import remove_overlaping_tags
+from src.processing.overlap import remove_overlaping_tags_products
 from src.utils.metrics import metric_iou
 from src.utils.price_detection_utils import convert_model_output_to_format
 
@@ -113,12 +113,11 @@ def evaluate_loss(model, data_loader, device):
                 # Save the torch image tensor into temp_image
                 torchvision.utils.save_image(images[0], temp_image.name, format="png")
                 products = object_detector.extract_objects([temp_image.name])
-            pred_locations = remove_overlaping_tags(products, pred_locations)
+            pred_locations = remove_overlaping_tags_products(products, pred_locations)
             # print(pred_locations.head(), pred_locations.shape)
 
             true_locations = convert_model_output_to_format(targets[0])
             iou_score = metric_iou(images[0], true_locations, pred_locations)
-            print(iou_score)
 
             for k, v in loss_dict.items():
                 losses[k].append(v.item())

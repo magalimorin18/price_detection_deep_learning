@@ -19,7 +19,7 @@ def compute_price_positions(prices: pd.DataFrame) -> pd.DataFrame:
 
 def distance_function(x1, y1, x2, y2):
     """Compute distance between two points."""
-    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+    return ((x1 - x2) ** 2 + 2 * (y1 - y2) ** 2) ** 0.5
 
 
 def find_closest_price(product: pd.Series, prices: pd.DataFrame) -> pd.Series:

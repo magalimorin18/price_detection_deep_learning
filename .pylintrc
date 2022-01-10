@@ -206,7 +206,7 @@ good-names=i,
            ex,
            Run,
            _,
-           x1,x2,y1,y2,ax,im,df,v,n,p,q,x
+           x1,x2,y1,y2,ax,im,df,v,n,p,q,x,s1,s2
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted

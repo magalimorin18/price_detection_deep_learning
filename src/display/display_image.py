@@ -58,7 +58,7 @@ def display_annotations(
                 annotation.x2 - annotation.x1,
                 annotation.y2 - annotation.y1,
                 color=color,
-                fill=None,
+                fill=color == 0,
             )
         )
         if display_center:

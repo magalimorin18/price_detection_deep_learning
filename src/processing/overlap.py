@@ -20,7 +20,7 @@ def overlap_area(px1, py1, px2, py2, qx1, qy1, qx2, qy2, bottle_factor=0.15):
     return max(0, x2 - x1) * max(0, y2 - y1)
 
 
-def remove_overlaping_tags(products: pd.DataFrame, prices: pd.DataFrame) -> pd.DataFrame:
+def remove_overlaping_tags_products(products: pd.DataFrame, prices: pd.DataFrame) -> pd.DataFrame:
     """Remove the overlaping tags."""
     to_remove = set()
     for q in prices.itertuples():
@@ -35,3 +35,34 @@ def remove_overlaping_tags(products: pd.DataFrame, prices: pd.DataFrame) -> pd.D
                 to_remove.add(q.Index)
                 break
     return prices.drop(list(to_remove))
+
+
+def box_score(row1, row2):
+    """Compute the row scores."""
+    area1 = (row1.x2 - row1.x1 + 1) * (row1.y2 - row1.y1 + 1)
+    area2 = (row2.x2 - row2.x1 + 1) * (row2.y2 - row2.y1 + 1)
+    x1 = max(row1.x1, row2.x1)
+    y1 = max(row1.y1, row2.y1)
+    x2 = min(row1.x2, row2.x2)
+    y2 = min(row1.y2, row2.y2)
+    area_intersection = max(0, x2 - x1 + 1) * max(0, y2 - y1 + 1)
+    return area_intersection / min(area1, area2), area1, area2
+
+
+def remove_overlaping_boxes(df: pd.DataFrame, threshold: float = 0.4) -> pd.DataFrame:
+    """Remove overlaps."""
+    to_remove = set()
+    for i in range(df.shape[0]):
+        for j in range(i + 1, df.shape[0]):
+            if j in to_remove:
+                continue
+            row1 = df.iloc[i]
+            row2 = df.iloc[j]
+            score, s1, s2 = box_score(row1, row2)
+            if score > threshold:
+                if s1 > s2:
+                    to_remove.add(j)
+                else:
+                    to_remove.add(i)
+                break
+    return df.copy().loc[~df.index.isin(to_remove)]

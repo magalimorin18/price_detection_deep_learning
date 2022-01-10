@@ -9,6 +9,7 @@ import torch
 
 from src.config import PRICE_DETECTION_MODEL_PATH
 from src.models.utils import get_model, transforms
+from src.processing.overlap import remove_overlaping_boxes
 from src.utils.price_detection_utils import convert_model_output_to_format
 
 
@@ -25,7 +26,9 @@ class PriceDetector:
         # self.model.to(self.device)
         logging.info("[Price Detector] Initialized.")
 
-    def extract_prices_locations(self, images: List[np.ndarray]) -> List[pd.DataFrame]:
+    def extract_prices_locations(
+        self, images: List[np.ndarray], do_remove_overlaps: bool = True
+    ) -> List[pd.DataFrame]:
         """Extract prices locations from images."""
         logging.info("[Price Detector] Extracting prices locations...")
         self.model.eval()
@@ -34,6 +37,8 @@ class PriceDetector:
             result = self.model(transforms(image).unsqueeze(0))[0]
             model_annotations = convert_model_output_to_format(result)
             model_annotations["price"] = model_annotations["score"].apply(lambda x: round(x, 2))
+            if do_remove_overlaps:
+                model_annotations = remove_overlaping_boxes(model_annotations)
             prices_locations.append(model_annotations)
         logging.info("[Price Detector] Extracted prices locations.")
         return prices_locations
