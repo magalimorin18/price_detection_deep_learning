@@ -10,6 +10,7 @@ from PIL import Image
 from src.display.display_image import display_annotations, display_image
 from src.models.object_detector import ObjectDetector
 from src.models.price_detector import PriceDetector
+from src.processing.overlap import remove_overlaping_tags
 from src.utils.distances import (
     compute_price_positions,
     compute_product_positions,
@@ -65,7 +66,8 @@ with NamedTemporaryFile(delete=False) as temp_image:
             prices = price_detector.extract_prices_locations([image])[0]
         st.dataframe(prices)
 
-        # TODO: Remove the prices that overlap more than 50% with the products
+        # Remove the prices that overlap more than 50% with the products
+        prices = remove_overlaping_tags(products, prices)
 
         fig, ax = plt.subplots(figsize=(10, 10))
         display_image(image, ax=ax)
