@@ -1,5 +1,7 @@
 # price_detection_deep_learning
 
+[![wakatime](https://wakatime.com/badge/user/5fba56dd-c3e1-4bec-9596-fd1565702df9/project/a1c8fad7-d886-4e60-bd73-1a94648fa163.svg)](https://wakatime.com/badge/user/5fba56dd-c3e1-4bec-9596-fd1565702df9/project/a1c8fad7-d886-4e60-bd73-1a94648fa163)
+
 ## Data
 
 The structure of the data folder is the following:
