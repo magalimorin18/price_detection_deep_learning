@@ -37,7 +37,11 @@ class PriceLocationsDataset:
         return len(self.unique_images)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Get one item."""
+        """Get one item
+
+        For one index, it will return the image and all the boxes in it with their
+        corresponding label.
+        """
         img_name = self.unique_images[idx]
 
         # Get the image

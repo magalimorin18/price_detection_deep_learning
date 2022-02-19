@@ -73,7 +73,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch):
 
 
 # pylint: disable=too-many-locals
-def evaluate_loss(model, data_loader, device):
+def evaluate_loss(model, data_loader, device, remove_products: bool = True):
     """Evaluate one model on object detection."""
     # TODO: Works only with data_loader with one element per batch
     model.to(device)
@@ -89,7 +89,8 @@ def evaluate_loss(model, data_loader, device):
     }
 
     # To improve the scores, we will remove the annotations that are over products
-    object_detector = ObjectDetector()
+    if remove_products:
+        object_detector = ObjectDetector()
 
     with torch.no_grad():
         for images, targets in tqdm(data_loader, desc="Evaluation", total=len(data_loader)):
@@ -107,21 +108,23 @@ def evaluate_loss(model, data_loader, device):
             pred = model(images)
 
             pred_locations = convert_model_output_to_format(pred[0])
-            # print(pred_locations.head(), pred_locations.shape)
-            # Save the image in temp file and then run the object detector
-            with NamedTemporaryFile(delete=False) as temp_image:
-                # Save the torch image tensor into temp_image
-                torchvision.utils.save_image(images[0], temp_image.name, format="png")
-                products = object_detector.extract_objects([temp_image.name])
-            pred_locations = remove_overlaping_tags(products, pred_locations)
-            # print(pred_locations.head(), pred_locations.shape)
+
+            if remove_products:
+                # print(pred_locations.head(), pred_locations.shape)
+                # Save the image in temp file and then run the object detector
+                with NamedTemporaryFile(delete=False) as temp_image:
+                    # Save the torch image tensor into temp_image
+                    torchvision.utils.save_image(images[0], temp_image.name, format="png")
+                    products = object_detector.extract_objects([temp_image.name])
+                pred_locations = remove_overlaping_tags(products, pred_locations)
+                # print(pred_locations.head(), pred_locations.shape)
 
             true_locations = convert_model_output_to_format(targets[0])
             iou_score = metric_iou(images[0], true_locations, pred_locations)
-            print(iou_score)
+            # print(iou_score)
 
             for k, v in loss_dict.items():
-                losses[k].append(v.item())
+                losses[k].append(v.cpu().item())
             losses["iou_score"].append(iou_score)
     return losses
 

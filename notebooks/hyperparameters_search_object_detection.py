@@ -48,7 +48,7 @@ print("Sample of the different parameters:")
 pprint(get_params_from_distributions(params_config))
 
 # pylint: disable=using-constant-test
-if True:
+if False:
     find_best_model(params_config=params_config, n=20)
 
 df = pd.read_csv("../data/training_results.csv")
@@ -61,3 +61,20 @@ other_cols = [x for x in df.columns if x not in loss_cols]
 df.columns
 
 df[other_cols].sort_values(by="iou_score_mean", ascending=False)
+
+print(
+    df[other_cols]
+    .sort_values(by="iou_score_mean", ascending=False)
+    .head(5)[
+        [
+            "iou_score_mean",
+            "iou_score_max",
+            "iou_score_min",
+            "iou_score_std",
+            "model_param_model_type",
+            "model_param_OPTI_LEARNING_RATE",
+            "model_param_epochs",
+        ]
+    ]
+    .to_latex(float_format="%.3f")
+)
