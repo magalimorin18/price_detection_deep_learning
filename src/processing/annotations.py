@@ -7,10 +7,13 @@ from typing import Literal
 import pandas as pd
 
 from src.config import (
+    TEST_DIGIT_LOCATIONS_CSV_FOLDER,
     TEST_PRICE_LOCATIONS_FILE,
     TEST_PRICE_LOCATIONS_FOLDER,
+    TRAIN_DIGIT_LOCATIONS_CSV_FOLDER,
     TRAIN_PRICE_LOCATIONS_FILE,
     TRAIN_PRICE_LOCATIONS_FOLDER,
+    VAL_DIGIT_LOCATIONS_CSV_FOLDER,
 )
 
 
@@ -28,6 +31,18 @@ def load_annotations_one_image(
     return pd.DataFrame()
 
 
+def load_annotations_one_price_tag(price_tag_index: int) -> pd.DataFrame:
+    """Load all the annotations."""
+    path = os.path.join(
+        TRAIN_DIGIT_LOCATIONS_CSV_FOLDER,
+        os.path.basename(str(price_tag_index)),
+    ).replace(".jpg", ".csv")
+    if os.path.isfile(path):
+        return pd.read_csv(path)
+    logging.warning("No annotations found for %s", price_tag_index)
+    return pd.DataFrame()
+
+
 def save_annotations_one_image(
     image_name: str, annotations: pd.DataFrame, dataset: Literal["train", "test"] = "train"
 ) -> None:
@@ -36,6 +51,30 @@ def save_annotations_one_image(
         TRAIN_PRICE_LOCATIONS_FOLDER if dataset == "train" else TEST_PRICE_LOCATIONS_FOLDER,
         os.path.basename(image_name),
     )
+    print(path)
+    annotations.to_csv(path.replace(".jpg", ".csv"), index=False)
+
+
+def save_annotations_one_price_tag(
+    price_tag_index: int, annotations: pd.DataFrame, dataset: Literal["train", "test", "val"]
+) -> None:
+    """Save all the annotations."""
+    if dataset == "train":
+        path = os.path.join(
+            TRAIN_DIGIT_LOCATIONS_CSV_FOLDER,
+            os.path.basename(str(price_tag_index)),
+        )
+    elif dataset == "test":
+        path = os.path.join(
+            TEST_DIGIT_LOCATIONS_CSV_FOLDER,
+            os.path.basename(str(price_tag_index)),
+        )
+    elif dataset == "val":
+        path = os.path.join(
+            VAL_DIGIT_LOCATIONS_CSV_FOLDER,
+            os.path.basename(str(price_tag_index)),
+        )
+
     print(path)
     annotations.to_csv(path.replace(".jpg", ".csv"), index=False)
 

@@ -18,8 +18,18 @@ TRAIN_IMAGES = os.path.join(DATA_FOLDER, "train", "images")
 
 TRAIN_PRICE_LOCATIONS_FILE = os.path.join(DATA_FOLDER, "train", "price_tags.csv")
 TRAIN_PRICE_LOCATIONS_FOLDER = os.path.join(DATA_FOLDER, "train", "price_tags")
+
 TEST_PRICE_LOCATIONS_FILE = os.path.join(DATA_FOLDER, "test", "price_tags.csv")
 TEST_PRICE_LOCATIONS_FOLDER = os.path.join(DATA_FOLDER, "test", "price_tags")
+
+TRAIN_DIGIT_LOCATIONS_FILE = os.path.join(DATA_FOLDER, "train", "digit_tags.csv")
+TRAIN_DIGIT_LOCATIONS_IMAGES_FOLDER = os.path.join(DATA_FOLDER, "train", "digit_tags_images")
+TEST_DIGIT_LOCATIONS_IMAGES_FOLDER = os.path.join(DATA_FOLDER, "test", "digit_tags_images")
+VAL_DIGIT_LOCATIONS_IMAGES_FOLDER = os.path.join(DATA_FOLDER, "validation", "digit_tags_images")
+
+TRAIN_DIGIT_LOCATIONS_CSV_FOLDER = os.path.join(DATA_FOLDER, "train", "digit_tags_csv")
+TEST_DIGIT_LOCATIONS_CSV_FOLDER = os.path.join(DATA_FOLDER, "test", "digit_tags_csv")
+VAL_DIGIT_LOCATIONS_CSV_FOLDER = os.path.join(DATA_FOLDER, "validation", "digit_tags_csv")
 
 
 # MODELS

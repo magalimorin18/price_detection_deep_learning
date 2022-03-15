@@ -1,6 +1,6 @@
 # %%
 """Annotate images"""
-# !pip install jupyter_bbox_widget --quiet
+# !jupyter nbextension enable --py jupyter_bbox_widget
 # pylint: disable=wrong-import-position,invalid-name,pointless-statement
 # %load_ext autoreload
 # %autoreload 2
@@ -33,8 +33,8 @@ LABEL = "price_tag"
 logging.basicConfig(level=logging.INFO)
 
 # %%
-image_name = "0670.jpg"
-dataset = "test"
+image_name = "0000.jpg"
+dataset = "train"
 image_path = os.path.join(TEST_IMAGES if dataset == "test" else TRAIN_IMAGES, image_name)
 print(image_path)
 
@@ -48,7 +48,7 @@ print(f"Found {len(bboxes)} boxes")
 
 # %%
 widget = BBoxWidget(
-    image=".." + image_path.split("..")[-1].replace("\\", "/"), classes=[LABEL], bboxes=bboxes
+    image=".." + image_path.split("..")[-1].replace("\\", "/"), classes=[LABEL, "0"], bboxes=bboxes
 )
 widget
 
@@ -91,5 +91,7 @@ for image_path, pred in zip(image_paths, model_output):
         )
     )
 
+
+# %%
 
 # %%
