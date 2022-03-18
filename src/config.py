@@ -34,6 +34,9 @@ VAL_DIGIT_LOCATIONS_CSV_FOLDER = os.path.join(DATA_FOLDER, "validation", "digit_
 
 # MODELS
 PRICE_DETECTION_MODEL_PATH = os.path.join(SAVED_MODELS, "price_detection_model.pt")
+PRICE_PREDICTION_MODEL_PATH = os.path.join(SAVED_MODELS, "price_prediction_model.pt")
+
+PRICE_PREDICTOR_MODEL_PATH = os.path.join(SAVED_MODELS, "price_predictor.pth")
 
 
 # TRAINING RESULTS
