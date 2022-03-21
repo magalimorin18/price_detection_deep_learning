@@ -13,6 +13,7 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from src.config import PRICE_PREDICTOR_MODEL_PATH
+from src.data.price_locations import PriceLocationsDataset
 from src.models.class_cnnnet import CNNNet
 
 
@@ -89,20 +90,19 @@ class PricePredictor:
         digit_tensor = digit_tensor.unsqueeze(0)
         return digit_tensor
 
-    def __detect_digits_on_image(self, tag_img: np.ndarray) -> List[np.ndarray]:
+    def __detect_digits_on_image(self, tag_image: np.ndarray) -> List[np.ndarray]:
         """
         Entry : image of a tag
         Returns : a list of the images of each digits detected on the tag
         """
         list_digits_img = []
-
         # Transformations (black and white)
-        img_black_and_white = cv2.cvtColor(tag_img, cv2.COLOR_BGR2GRAY)
+        img_black_and_white = cv2.cvtColor(tag_image, cv2.COLOR_BGR2GRAY)
         img_invert_color = cv2.bitwise_not(img_black_and_white)
         _, thresh = cv2.threshold(img_invert_color, 100, 255, 0)
 
         # Detect the digits contours
-        list_contours, _ = cv2.findContours(tag_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        list_contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         df_digits_contours = self.__create_contours(list_contours, precision=2)
         df_digits_contours = self.__filter_contours(df_digits_contours, distance_btw_digits=2)
 
@@ -178,3 +178,13 @@ class PricePredictor:
             return boxes
         df_digits_contours = df.iloc[boxes]
         return df_digits_contours
+
+
+if __name__ == "__main__":
+    dataset = PriceLocationsDataset()
+    df_tag = pd.read_csv("./data/train/price_tags.csv").iloc[1]
+    image = dataset.get_original_image(df_tag.img_name)
+    tag_img = image[int(df_tag.y1) : int(df_tag.y2), int(df_tag.x1) : int(df_tag.x2)]
+    price_predictor = PricePredictor()
+    predicted_price = price_predictor.extract_prices_locations([tag_img])
+    print(predicted_price)

@@ -6,3 +6,5 @@ scikit-learn==1.0.1
 matplotlib==3.5.0
 ploomber==0.13.6
 streamlit==1.2.0
+opencv-python==4.5.5.62
+scikit-image==0.19.1
