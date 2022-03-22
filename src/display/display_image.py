@@ -12,7 +12,10 @@ COLOR_LIST: List[str] = ["#00ff08", "#ff0f0f", "#ec008c", "#4DC6E2"]
 
 
 def display_image(
-    img: np.ndarray, ax: Optional[plt.Axes] = None, display_axes: bool = False
+    img: np.ndarray,
+    ax: Optional[plt.Axes] = None,
+    display_axes: bool = False,
+    b_and_w: bool = False,
 ) -> None:
     """Display one image."""
     if ax is None:
@@ -22,7 +25,10 @@ def display_image(
         img = np.array(img)
     if img.shape[0] == 3:
         img = np.transpose(img, (1, 2, 0))
-    ax.imshow(img)
+    if b_and_w:
+        ax.imshow(img, cmap="gray")
+    else:
+        ax.imshow(img)
     if display_axes is True:
         ax.tick_params(axis="x", which="both")
         ax.tick_params(axis="y", which="both")

@@ -4,6 +4,7 @@ Inspiration from this tutorial from pytorch:
 https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 """
 # pylint: disable=wrong-import-position,invalid-name,expression-not-assigned
+
 # %load_ext autoreload
 # %autoreload 2
 
