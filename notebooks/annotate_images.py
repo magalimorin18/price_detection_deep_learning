@@ -33,8 +33,8 @@ LABEL = "price_tag"
 logging.basicConfig(level=logging.INFO)
 
 # %%
-image_name = "0000.jpg"
-dataset = "train"
+image_name = "0675.jpg"
+dataset = "test"
 image_path = os.path.join(TEST_IMAGES if dataset == "test" else TRAIN_IMAGES, image_name)
 print(image_path)
 
