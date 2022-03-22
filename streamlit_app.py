@@ -13,7 +13,6 @@ from src.models.object_detector import ObjectDetector
 from src.models.price_detector import PriceDetector
 from src.models.price_predictor import PricePredictor
 from src.processing.overlap import remove_overlaping_tags
-
 from src.utils.distances import (
     compute_price_positions,
     compute_product_positions,
@@ -21,7 +20,7 @@ from src.utils.distances import (
 )
 
 
-@st.cache(max_entries=1)
+@st.experimental_singleton
 def load_objects():
     """Load the different models."""
     return ObjectDetector(), PriceDetector(), PricePredictor()

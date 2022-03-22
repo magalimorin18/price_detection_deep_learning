@@ -18,15 +18,10 @@ class ObjectDetector:
         self,
         model_name: str = "ultralytics/yolov5",
         model_version: str = "yolov5s",
-        fake_yolo=False,
     ) -> None:
         """Init."""
-        self.fake_yolo = fake_yolo
-        if self.fake_yolo:
-            return None
-        self.model = torch.hub.load(
-            repo_or_dir=model_name, model=model_version, pretrained=True, force_reload=True
-        )
+        torch.hub.set_dir("./models/.cache")
+        self.model = torch.hub.load(repo_or_dir=model_name, model=model_version, pretrained=True)
         logging.info("[Object Detector] Now ready to operate!")
 
     def extract_objects(self, images: List[str]) -> pd.DataFrame:
@@ -37,19 +32,6 @@ class ObjectDetector:
         :returns: All the boxes (as dataframe),
         columns: img_name,x1,x2,y1,y2,yolo_confidence,yolo_class_id,yolo_class_name.
         """
-        if self.fake_yolo:
-            return pd.DataFrame(
-                dict(
-                    img_name=[],
-                    x1=[],
-                    x2=[],
-                    y1=[],
-                    y2=[],
-                    yolo_confidence=[],
-                    yolo_class_id=[],
-                    yolo_class_name=[],
-                )
-            )
         logging.info("[Object Detector] Prediction on %i images", len(images))
         results = self.model(images[:])
         final_results = []
