@@ -88,7 +88,7 @@ def combine_all_annotations(dataset: Literal["train", "test"] = "train") -> None
             df = pd.read_csv(os.path.join(folder, filename))
             df["img_name"] = filename.replace(".csv", ".jpg")
             dfs.append(df)
-    df = pd.concat(dfs, ignore_index=True)
+    df = pd.concat(dfs, ignore_index=True)[["img_name", "x1", "x2", "y1", "y2"]]
     df.to_csv(
         os.path.join(
             TRAIN_PRICE_LOCATIONS_FILE if dataset == "train" else TEST_PRICE_LOCATIONS_FILE
