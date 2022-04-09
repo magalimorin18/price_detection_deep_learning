@@ -17,3 +17,6 @@ install-cpu: install
 
 install-gpu: install
 	pip3 install torch==1.10.0+cu102 torchvision==0.11.1+cu102 -f https://download.pytorch.org/whl/cu102/torch_stable.html
+
+run:
+	streamlit run ./streamlit_app.py

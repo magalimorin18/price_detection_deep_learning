@@ -34,6 +34,11 @@ def find_closest_price(product: pd.Series, prices: pd.DataFrame) -> pd.Series:
 
     pi_x, pi_y = closest_price.pos_x.item(), closest_price.pos_y.item()
 
+    product["price_x1"] = closest_price.x1
+    product["price_y1"] = closest_price.y1
+    product["price_x2"] = closest_price.x2
+    product["price_y2"] = closest_price.y2
+
     product["price_x"] = pi_x
     product["price_y"] = pi_y
     product["price_id"] = closest_price.index[0]
