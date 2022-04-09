@@ -2,12 +2,14 @@
 # pylint:disable=R0903
 # Too few public methods (1/2) (too-few-public-methods)
 import logging
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
+from matplotlib import patches
 from skimage.transform import resize
 from torchvision import transforms
 from tqdm import tqdm
@@ -20,6 +22,12 @@ from src.models.class_cnnnet import CNNNet
 class PricePredictor:
     """Price prediction using CNN model"""
 
+    CONTOUR_BORDER = 2
+    GRAY_THRESHOLD = 100
+    SIZE_RATIO = 0.6
+    MIN_WIDTH = 11
+    MIN_HEIGHT = 11
+
     def __init__(self, device: Union[int, torch.device] = 0):
         """Init."""
         logging.info("[Price Predictor] Initializing...")
@@ -29,49 +37,78 @@ class PricePredictor:
         # self.model.to(self.device)
         logging.info("[Price Predictor] Initialized.")
 
-    def extract_prices_locations(self, tag_images: List[np.ndarray]) -> List[str]:
+    def extract_prices_locations(self, tag_images: List[np.ndarray]) -> List[float]:
         """Extract prices from a tag"""
         logging.info("[Price Predictor] Extracting prices prediction...")
         self.model.eval()
-        prices_prediction: List[str] = []
+        prices_predictions: List[float] = []
         for tag_image in tqdm(tag_images, desc="Extract and classify digits"):
-            result = self.__extract_prices_locations_one(tag_image)
-            prices_prediction.append(result)
+            result = self._extract_prices_locations_one(tag_image)
+            prices_predictions.append(self._convert_output_to_number(result))
+        logging.debug(prices_predictions)
         logging.info("[Price Detector] Extracted prices locations.")
-        return prices_prediction
+        return prices_predictions
 
-    def __extract_prices_locations_one(self, tag_image: np.ndarray) -> str:
+    def _extract_prices_locations_one(self, tag_image: np.ndarray) -> str:
         """
         Entry: The tag image
         Returns : The price on the tag
         """
         # Detect all the characters on the image
-        digit_images = self.__detect_digits_on_image(tag_image)
+        list_digits_img = []
+
+        # Transformations (black and white)
+        img_black_and_white = cv2.cvtColor(tag_image, cv2.COLOR_BGR2GRAY)
+        img_invert_color = cv2.bitwise_not(img_black_and_white)
+        _, thresh = cv2.threshold(img_invert_color, self.GRAY_THRESHOLD, 255, 0)
+
+        # Detect the digits contours
+        list_contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        try:
+            df_digits_contours = self._convert_cv2_contours_to_dataframe(list_contours)
+        except AttributeError:
+            logging.error(
+                "Seems like we did not found any digit on the tag... (nbr tags: %i)",
+                len(list_contours),
+            )
+            return ""
+        # df_digits_contours = self._filter_contours(df_digits_contours, distance_btw_digits=2)
+        # self._plot_with_contours(thresh, df_digits_contours)
+
+        # Crop the digits
+        for i in range(len(df_digits_contours)):
+            df_single_digit = df_digits_contours.iloc[i]
+            digit_img = thresh[
+                int(df_single_digit.y1) : int(df_single_digit.y2),
+                int(df_single_digit.x1) : int(df_single_digit.x2),
+            ]
+            list_digits_img.append(digit_img)
+        logging.debug("[Price Predictor] Detected %d digits", len(list_digits_img))
 
         # Classify all those characters
         outputs: List[int] = []
-        for digit_image in digit_images:
-            outputs.append(self.__classify_digit(digit_image))
+        for digit_image in list_digits_img:
+            outputs.append(self._classify_digit(digit_image)[0])
 
         return "".join(list(map(str, outputs)))
 
-    def __classify_digit(self, digit_img: np.ndarray, threshold_proba=0.1) -> int:
+    def _classify_digit(self, digit_img: np.ndarray, threshold_proba=0.1) -> Tuple[int, float]:
         """
         Entry : the image of a digit
         Returns : the predicted digit as an int
         """
-        digit_tensor = self.__digit_img_transformation(digit_img)
+        digit_tensor = self._digit_img_transformation(digit_img)
         digit_prediction_tensor = self.model(digit_tensor.unsqueeze(0))[0]
-        digit_prediction_tensor = torch.nn.Softmax()(digit_prediction_tensor)
+        digit_prediction_tensor = torch.nn.Softmax(dim=0)(digit_prediction_tensor)
         digit_prediction = digit_prediction_tensor.argmax()
         digit_prediction_int = int(digit_prediction.numpy())
         proba = digit_prediction_tensor[digit_prediction_int].item()
         if proba > threshold_proba:
-            return digit_prediction_int
-        return -1
+            return digit_prediction_int, proba
+        return -1, 0.0
 
     @staticmethod
-    def __digit_img_transformation(digit_img: np.ndarray, padding=10):
+    def _digit_img_transformation(digit_img: np.ndarray, padding=10):
         """
         Entry : image of a digit
         Returns : image of the digit transformed to the format of a tensor
@@ -90,34 +127,7 @@ class PricePredictor:
         digit_tensor = digit_tensor.unsqueeze(0)
         return digit_tensor
 
-    def __detect_digits_on_image(self, tag_image: np.ndarray) -> List[np.ndarray]:
-        """
-        Entry : image of a tag
-        Returns : a list of the images of each digits detected on the tag
-        """
-        list_digits_img = []
-        # Transformations (black and white)
-        img_black_and_white = cv2.cvtColor(tag_image, cv2.COLOR_BGR2GRAY)
-        img_invert_color = cv2.bitwise_not(img_black_and_white)
-        _, thresh = cv2.threshold(img_invert_color, 100, 255, 0)
-
-        # Detect the digits contours
-        list_contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        df_digits_contours = self.__create_contours(list_contours, precision=2)
-        df_digits_contours = self.__filter_contours(df_digits_contours, distance_btw_digits=2)
-
-        # Crop the digits
-        for i in range(len(df_digits_contours)):
-            df_single_digit = df_digits_contours.iloc[i]
-            digit_img = thresh[
-                int(df_single_digit.y1) : int(df_single_digit.y2),
-                int(df_single_digit.x1) : int(df_single_digit.x2),
-            ]
-            list_digits_img.append(digit_img)
-        return list_digits_img
-
-    @staticmethod
-    def __create_contours(list_contours: List, precision: int) -> pd.DataFrame:
+    def _convert_cv2_contours_to_dataframe(self, list_contours: List) -> pd.DataFrame:
         """
         Entry : list of the contours with width height of the digits on a tag
         Returns : dataframe with delimitation of each contour (x1,x2,y1,y2)
@@ -128,31 +138,34 @@ class PricePredictor:
             box = cv2.boxPoints(rect)
             rect_list.append(
                 {
-                    "x1": box[0][0] - precision,
-                    "y1": box[0][1] - precision,
-                    "x2": box[2][0] + precision,
-                    "y2": box[2][1] + precision,
+                    "x1": box[0][0] - self.CONTOUR_BORDER,
+                    "y1": box[0][1] - self.CONTOUR_BORDER,
+                    "x2": box[2][0] + self.CONTOUR_BORDER,
+                    "y2": box[2][1] + self.CONTOUR_BORDER,
                 }
             )
-        tag_contours = pd.DataFrame.from_records(rect_list)  # dataframe avec x1, x2, y1, y2
-        tag_contours_without_neg_values = tag_contours[
+
+        # Convert to dataframe and remove useless rectangles
+        tag_contours = pd.DataFrame.from_records(rect_list)
+        tag_contours = tag_contours[
             (tag_contours > 0).all(axis=1)
-            & (tag_contours.x2 - tag_contours.x1 > 1)
-            & (tag_contours.y2 - tag_contours.y1 > 1)
+            & (tag_contours.x2 - tag_contours.x1 > self.MIN_WIDTH)
+            & (tag_contours.y2 - tag_contours.y1 > self.MIN_HEIGHT)
+            & (
+                (tag_contours.x2 - tag_contours.x1) * self.SIZE_RATIO
+                < (tag_contours.y2 - tag_contours.y1)
+            )
         ]
-        df_digits_contours = tag_contours_without_neg_values[
-            ((tag_contours.x2 - tag_contours.x1) < (tag_contours.y2 - tag_contours.y1))
-        ]
-        return df_digits_contours
+
+        return tag_contours.copy().sort_values(by=["x1", "y1"])
 
     @staticmethod
-    def __filter_contours(df_digits_contours: pd.DataFrame, distance_btw_digits: int = 2):
+    def _filter_contours(df: pd.DataFrame, distance_btw_digits: int = 2):
         """
         Entry : dataframe with delimitation of each contour (x1,x2,y1,y2)
         Returns : filter the contours that cannot logically be digits
         """
         boxes = []  # Liste des indices du dataframe ou il y a les bon digits
-        df = df_digits_contours.sort_values(by=["x1"], ascending=True)
         for i in range(len(df) - 1):
             for j in range(len(df) - 1):
                 box1x2 = df.iloc[i, 2]
@@ -178,6 +191,34 @@ class PricePredictor:
             return boxes
         df_digits_contours = df.iloc[boxes]
         return df_digits_contours
+
+    @staticmethod
+    def _convert_output_to_number(output: str) -> float:
+        """Convert the output to a number."""
+        if len(output) == 0:
+            return -1.0
+        if len(output) <= 2:
+            return float(output)
+        if len(output) == 3:
+            return float(f"{output[:2]}.{output[2]}")
+        return float(f"{output[:2]}.{output[2:4]}")
+
+    @staticmethod
+    def _plot_with_contours(img: np.ndarray, contours: pd.DataFrame = None):
+        _, ax = plt.subplots()
+        ax.imshow(img)
+        if contours is not None:
+            for _, tag_contour in contours.iterrows():
+                ax.add_patch(
+                    patches.Rectangle(
+                        (tag_contour["x1"], tag_contour["y1"]),
+                        tag_contour["x2"] - tag_contour["x1"],
+                        tag_contour["y2"] - tag_contour["y1"],
+                        color="b",
+                        fill=None,
+                    )
+                )
+        plt.show()
 
 
 if __name__ == "__main__":

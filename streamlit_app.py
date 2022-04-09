@@ -29,7 +29,7 @@ def load_objects():
 object_detector, price_detector, price_predictor = load_objects()
 
 
-st.markdown("# Price detection")
+st.markdown("# Price is all you Need ! 💰")
 
 st.markdown(
     "Price detection in supermarkets to quickly identify the prices of the different products."
@@ -59,7 +59,7 @@ with NamedTemporaryFile(delete=False) as temp_image:
 
         fig, ax = plt.subplots(figsize=(10, 10))
         display_image(image, ax=ax)
-        display_annotations(products, ax=ax)
+        display_annotations(products, ax=ax, color=0)
         st.pyplot(fig=fig)
 
         # Detect the prices on the image
@@ -73,8 +73,8 @@ with NamedTemporaryFile(delete=False) as temp_image:
 
         fig, ax = plt.subplots(figsize=(10, 10))
         display_image(image, ax=ax)
-        display_annotations(prices, ax=ax, color=0)
-        display_annotations(products, ax=ax, color=1)
+        display_annotations(prices, ax=ax, color=1)
+        display_annotations(products, ax=ax, color=0)
         st.pyplot(fig=fig)
 
         st.markdown("## 4. Find the corresponding price for each product")
@@ -89,8 +89,8 @@ with NamedTemporaryFile(delete=False) as temp_image:
 
         fig, ax = plt.subplots(figsize=(10, 10))
         display_image(image, ax=ax)
-        display_annotations(prices, ax=ax, color=0)
-        display_annotations(products, ax=ax, color=1)
+        display_annotations(prices, ax=ax, color=1)
+        display_annotations(products, ax=ax, color=0)
         for product in product_to_price.itertuples():
             ax.plot([product.pos_x, product.price_x], [product.pos_y, product.price_y], c="b")
         st.pyplot(fig=fig)
@@ -99,15 +99,31 @@ with NamedTemporaryFile(delete=False) as temp_image:
         with st.spinner("Predicting prices..."):
             tag_images = []
             np_image = np.array(image)
-            for _, tag in prices.iterrows():
-                tag_images.append(np_image[int(tag.y1) : int(tag.y2), int(tag.x1) : int(tag.x2)])
+            for _, tag in product_to_price.iterrows():
+                tag_images.append(
+                    np_image[
+                        int(tag.price_y1) : int(tag.price_y2), int(tag.price_x1) : int(tag.price_x2)
+                    ]
+                )
             predicted_prices = price_predictor.extract_prices_locations(tag_images)
-            prices["price"] = predicted_prices
+            product_to_price["price"] = predicted_prices
 
+        st.dataframe(product_to_price)
         fig, ax = plt.subplots(figsize=(10, 10))
         display_image(image, ax=ax)
-        display_annotations(prices, ax=ax, color=0)
-        display_annotations(products, ax=ax, color=1)
+        display_annotations(product_to_price[["x1", "x2", "y1", "y2"]], ax=ax, color=0)
+        display_annotations(
+            product_to_price[["price_x1", "price_x2", "price_y1", "price_y2", "price"]].rename(
+                columns={
+                    "price_x1": "x1",
+                    "price_x2": "x2",
+                    "price_y1": "y1",
+                    "price_y2": "y2",
+                }
+            ),
+            ax=ax,
+            color=1,
+        )
         for product in product_to_price.itertuples():
             ax.plot([product.pos_x, product.price_x], [product.pos_y, product.price_y], c="b")
         st.pyplot(fig=fig)

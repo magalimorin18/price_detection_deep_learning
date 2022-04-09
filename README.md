@@ -1,4 +1,4 @@
-# price_detection_deep_learning
+# Deep Learning Project -
 
 [![wakatime](https://wakatime.com/badge/user/5fba56dd-c3e1-4bec-9596-fd1565702df9/project/a1c8fad7-d886-4e60-bd73-1a94648fa163.svg)](https://wakatime.com/badge/user/5fba56dd-c3e1-4bec-9596-fd1565702df9/project/a1c8fad7-d886-4e60-bd73-1a94648fa163)
 [![CI](https://github.com/magalimorin18/price_detection_deep_learning/actions/workflows/main.yml/badge.svg)](https://github.com/magalimorin18/price_detection_deep_learning/actions/workflows/main.yml)
@@ -6,37 +6,19 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/magalimorin18/price_detection_deep_learning)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/magalimorin18/price_detection_deep_learning)
 
-## Data
+This project was created to practice deep learning on a dataset of prices of products. The dataset comes from the pricing challenge 2021 of Retail Vision for CVPR 2021 workshop https://retailvisionworkshop.github.io/pricing_challenge_2021/.
+The purpose of the final model is to identify the prices of each products on an image in a supermarket for instance.
 
-The structure of the data folder is the following:
-```
-- data
-    - train
-        - images
-            - 0000.jpg
-            - 0001.jpg
-        - price_tags
-            - 0000.csv
-            - 0001.csv
-        - annocations.csv
-        - price_tags.csv
-    - test
-        - images
-            - 0000.jpg
-            - 0001.jpg
-        - results.csv
-```
+You can check our report here: https://www.overleaf.com/read/vndycspxvfxr
 
-You can download the data from https://www.kaggle.com/itamargr/traxpricing-dataset, it is from the pricing challenge 2021 of Retail Vision for CVPR 2021 workshop https://retailvisionworkshop.github.io/pricing_challenge_2021/.
-
-
-## Dev
+## How to use the code
 
 - Install the dependencies `make install-dev`
 - Install the torch dependencies
     - On CPU: `make install-cpu`
     - On GPU: `make install-gpu`
-
+- __You can download the data and model weights form the following Google Drive folder: https://drive.google.com/drive/folders/147fTbdhXe5UB6iGQicHKYLORPxx6wf4_?usp=sharing__
+- Run the streamlit interface `make run`
 
 ## Price annotation
 
